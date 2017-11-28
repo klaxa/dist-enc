@@ -1,0 +1,111 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/app/css/style.css">
+<script src="https://unpkg.com/vue"></script>
+<script src="/app/js/dashboard.js"></script>
+</head>
+<body>
+
+<div id="dashboard">
+    <h3>Videos</h3>
+    <table>
+        <tr>
+            <th>Filename</th>
+            <th>State</th>
+            <th>Progress</th>
+            <th>Chunks</th>
+        <tr v-for="v in videos">
+            <td>{{ v.filename }}</td>
+            <td>{{ v.state }}</td>
+            <td><progress :value="v.percent.replace('%','')" max="100">
+</progress> {{v.percent}} </td>
+            <td>{{ v.chunks ? v.chunks.length : 0 }}</td>
+        </tr>
+        <tr>
+            <td>
+                <input type="text" id="upurl" v-model="upurl">
+            </td>
+            <td>
+                <button id="add_video_url" onclick="url_upload();">URL Upload</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="file" name="file"><button id="upload_video">File Upload</button>
+            </td>
+        </tr>
+    </table>
+    
+    <h3>Encodes</h3>
+    <table>
+        <tr>
+            <th>Video</th>
+            <th>Profile</th>
+            <th>State</th>
+            <th>Progress</th>
+        <tr v-for="e in encodes">
+            <td>{{ e._in }}</td>
+            <td>{{ e.pname }}</td>
+            <td v-if="e.state == 'done'"><a :href="e.url">done</a></td>
+            <td v-else>{{ e.state }}</td>
+            <td><progress :value="e.percent.replace('%','')" max="100">
+</progress> {{ e.percent }}</td>
+        </tr>
+        <tr>
+            <td>
+                <select v-model="video">
+                    <option disabled value="">Please select a video</option>>
+                    <option v-for="v in videos" v-bind:value="v._id">
+                        {{ v.filename}}
+                    </option>
+                </select>
+                <span>Selected: {{ video }}</span>
+            </td>
+            <td>
+                <select v-model="profile">
+                    <option disabled value="">Please select a profile</option>>
+                    <option v-for="p in profiles" v-bind:value="p._id">
+                        {{ p.name }}
+                    </option>
+                </select>
+                <span>Selected: {{ profile }}</span>
+            </td>
+            <td><button id="add_encode" onclick="add_encode();">Add Encode</button></td>
+        </tr>
+    </table>
+    
+    <h3>Profiles</h3>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Command</th>
+            <th>Description</th>
+        <tr v-for="p in profiles">
+            <td>{{ p.name}}</td>
+            <td>{{ p.cmd }}</td>
+            <td>{{ p.desc }}</td>
+        </tr>
+        <tr>
+            <td>
+                <input type="text" id="profile_name" v-model="name">
+            </td>
+            <td>
+                <input type="text" id="profile_cmd" v-model="cmd">
+            </td>
+            <td>
+                <input type="text" id="profile_desc" v-model="desc">
+            </td>
+            <td>
+                <button id="add_profile" onclick="add_profile();">Add Profile</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+<script>
+update();
+</script>
+</body>
+</html>
+
