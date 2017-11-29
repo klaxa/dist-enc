@@ -9,7 +9,7 @@ import os.path
 MKVMERGE = "mkvmerge"
 MKVINFO = "mkvinfo"
 
-mkvinfo_out_fmt = re.compile(r"(.) frame, track (\d+), timestamp (\d+) \(([0-9:\.]+)\), .*")
+mkvinfo_out_fmt = re.compile(r"(.) frame, track (\d+), time[a-z]* (\d+) \(([0-9:\.]+)\), .*")
 mkvmerge_out_fmt = re.compile(r"Progress: (\d+\%).*")
 
 def ts2secs(ts):
