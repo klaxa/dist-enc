@@ -142,6 +142,7 @@ class Videos:
         v = self.db.videos.find_one({"filename": v.filename})
         print(v)
         v["_id"] = str(v["_id"])
+        v["url"] = url
         print(v)
         ret = json.dumps(v)
         print(ret)
