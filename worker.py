@@ -20,9 +20,18 @@ def main():
         jobs = ret.json()
         if len(jobs) == 0:
             time.sleep(TIMEOUT)
+            print("No jobs, sleeping...")
             continue
-        ret = requests.get(BASEURL + "jobs/claim/" + jobs[0]["_id"])
-        desc = ret.json()
+        try:
+            ret = requests.get(BASEURL + "jobs/claim/" + jobs[0]["_id"])
+            desc = ret.json()
+        except:
+            time.sleep(TIMEOUT)
+            print("Server down, sleeping...")
+            continue
+            
+        if "chunk_url" not in desc:
+            continue
         ret = requests.get(desc["chunk_url"], stream=True)
         if 'Content-Length' in ret.headers:
             length = int(ret.headers['Content-Length'])
