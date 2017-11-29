@@ -417,7 +417,7 @@ class Videos:
     def clear_job_timeouts(self):
         ret = self.db.jobs.find({"timeout": {'$lte': int(time.time())}})
         for j in list(ret):
-            if ["state"] == "claimed":
+            if j["state"] == "claimed":
                 j["state"] = "ready"
             j["timeout"] = int(time.time() + TIMEOUT)
             self.set_job(j)
