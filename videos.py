@@ -384,11 +384,16 @@ class Videos:
     def add_encode_helper(self, enc, v, p):
         print(v)
         print(p)
+        nbc = len(v["chunks"])
+        nbj = 0
         for c in v["chunks"]:
             print(c)
             j = Job(c, p, enc["_id"])
             j = self.set_job(j.__dict__)
             enc["jobs"].append(j["_id"])
+            nbj += 1
+            enc["percent"] = str((nbj * 100.0) / nbc)[:5] + "%"
+            self.update_encode(enc)
         enc["state"] = "ready"
         enc["percent"] = "0%"
         print(enc)
