@@ -54,6 +54,7 @@ class mkvtool:
             except:
                 print(line)
             line = str(mkvinfo.stdout.readline())[2:-1].rstrip()
+        mkvinfo.stdout.close()
         mkvinfo.wait()
         print("filtering I-Frames")
         report("Read file, filtering...", "90%")
@@ -77,6 +78,7 @@ class mkvtool:
             except:
                 pass
             line = str(mkvmerge.stdout.readline())[2:-1].rstrip()
+        mkvmerge.stdout.close()
         mkvmerge.wait()
         report("splitting", "100%")
         return sorted([f for f in os.listdir(chunk_dir) if chunk_name in f])
@@ -95,6 +97,7 @@ class mkvtool:
             except:
                 pass
             line = str(mkvmerge.stdout.readline())[2:-1].rstrip()
+        mkvmerge.stdout.close()
         mkvmerge.wait()
         report("finished", "100%")
         return out
