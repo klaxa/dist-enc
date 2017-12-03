@@ -36,7 +36,7 @@ def upload(filename):
 
 @get("/videos")
 def videos():
-    return vids.get_all_videos()
+    return vids.cache["videos"]
 
 @post("/profile")
 def profile():
@@ -50,7 +50,7 @@ def profile():
 
 @get("/profiles")
 def get_profile():
-    return vids.get_profiles()
+    return vids.cache["profiles"]
 
 @get("/profile/<_id>")
 def get_profile(_id):
@@ -72,7 +72,7 @@ def add_encode():
 
 @get("/encodes")
 def get_encodes():
-    return vids.get_all_encodes()
+    return vids.cache["encodes"]
 
 @get("/encode/<_id>")
 def get_encode(_id):

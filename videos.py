@@ -70,6 +70,7 @@ class Videos:
         self.db_port = port
         self.client = None
         self.db = None
+        self.cache = {}
         self.workers = []
         self.watchdog = Thread(target=self.watchdog)
         
@@ -95,12 +96,14 @@ class Videos:
         self.client = pymongo.MongoClient(self.db_host, self.db_port)
         self.db = self.client.dist_enc
         self.db.videos.create_index("filename", unique=True)
+        self.update_cache()
     
     def update_video(self, v):
         print(v)
         ret = self.db.videos.update_one({"filename": v["filename"]},
               {'$set': dict(filter(lambda kv: kv[0] != '_id', v.items()))})
         print(ret)
+        self.update_cache()
     
     def update_encode(self, e):
         print(e)
@@ -108,6 +111,7 @@ class Videos:
               {'$set': dict(filter(lambda kv: kv[0] != '_id', e.items()))}, upsert=True)
         ret = self.db.encodes.find_one({"vid": e["vid"], "pid": e["pid"]})
         ret["_id"] = str(ret["_id"])
+        self.update_cache()
         return ret
     
     def get_profiles(self):
@@ -350,6 +354,7 @@ class Videos:
         print(p)
         p["_id"] = str(p["_id"])
         ret = json.dumps(p)
+        self.update_cache()
         return ret
     
     def set_job(self, j):
@@ -422,4 +427,10 @@ class Videos:
                 j["state"] = "ready"
             j["timeout"] = int(time.time() + TIMEOUT)
             self.set_job(j)
+    
+    def update_cache(self):
+        self.cache["videos"] = self.get_all_videos()
+        self.cache["encodes"] = self.get_all_encodes()
+        self.cache["profiles"] = self.get_profiles()
+        print("Updated cache")
         
