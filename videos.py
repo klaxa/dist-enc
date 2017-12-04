@@ -309,8 +309,10 @@ class Videos:
             self.workers.append(downloader)
         except Exception as e:
             print(e)
+            return
         j["state"] = "done"
         self.set_job(j)
+        self.cache["videos"] = self.get_all_videos()
         
     def check_merge(self, eid):
         enc = self.get_encode_by_id(eid)
