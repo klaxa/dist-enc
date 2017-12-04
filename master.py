@@ -93,7 +93,7 @@ def get_jobs():
 
 @get("/jobs/ready")
 def get_ready_jobs():
-    return vids.get_ready_jobs()
+    return vids.cache["ready_jobs"]
 
 @get("/jobs/encode/<_id>")
 def get_jobs_by_encode(_id):

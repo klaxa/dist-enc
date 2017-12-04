@@ -103,7 +103,8 @@ class Videos:
         ret = self.db.videos.update_one({"filename": v["filename"]},
               {'$set': dict(filter(lambda kv: kv[0] != '_id', v.items()))})
         print(ret)
-        self.update_cache()
+        self.cache["videos"] = self.get_all_videos()
+        print("Updated videos cache")
     
     def update_encode(self, e):
         print(e)
@@ -111,7 +112,10 @@ class Videos:
               {'$set': dict(filter(lambda kv: kv[0] != '_id', e.items()))}, upsert=True)
         ret = self.db.encodes.find_one({"vid": e["vid"], "pid": e["pid"]})
         ret["_id"] = str(ret["_id"])
-        self.update_cache()
+        self.cache["encodes"] = self.get_all_encodes()
+        print("Updated encodes cache")
+        self.cache["ready_jobs"] = self.get_ready_jobs()
+        print("Updated jobs cache")
         return ret
     
     def get_profiles(self):
@@ -354,7 +358,8 @@ class Videos:
         print(p)
         p["_id"] = str(p["_id"])
         ret = json.dumps(p)
-        self.update_cache()
+        self.cache["profiles"] = self.get_profile()
+        print("Updated profiles cache")
         return ret
     
     def set_job(self, j):
@@ -412,8 +417,10 @@ class Videos:
             return json.dumps({"error": "Job not ready."})
         j["state"] = "claimed"
         j["timeout"] = int(time.time() + TIMEOUT)
-        print(j)
         self.set_job(j)
+        self.cache["ready_jobs"] = self.get_ready_jobs()
+        print("Updated jobs cache")
+        print(j)
         job_desc = {}
         job_desc["chunk_url"] = BASEURL + "chunk/" + j["_in"]
         job_desc["command"] = j["cmd"]
@@ -427,10 +434,13 @@ class Videos:
                 j["state"] = "ready"
             j["timeout"] = int(time.time() + TIMEOUT)
             self.set_job(j)
+        self.cache["ready_jobs"] = self.get_ready_jobs()
+        print("Updated jobs cache")
     
     def update_cache(self):
         self.cache["videos"] = self.get_all_videos()
         self.cache["encodes"] = self.get_all_encodes()
         self.cache["profiles"] = self.get_profiles()
+        self.cache["ready_jobs"] = self.get_ready_jobs()
         print("Updated cache")
         
