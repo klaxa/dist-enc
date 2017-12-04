@@ -47,7 +47,10 @@ def main():
         ffmpeg = Popen(desc["command"])
         ffmpeg.wait()
         files = {"upload": (desc["command"][-1], open(desc["command"][-1], 'rb'), 'application/octet-stream')}
-        requests.post(BASEURL + "jobs/submit/" + jobs[0]["_id"], files=files)
+        try:
+            requests.post(BASEURL + "jobs/submit/" + jobs[0]["_id"], files=files)
+        except:
+            print("Error uploading, discarding chunk")
         os.remove(desc["chunk_url"].split("/")[-1])
         os.remove(desc["command"][-1])
         
