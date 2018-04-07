@@ -37,6 +37,9 @@ class mkvtool:
             if "Segment" in line:
                 segment_flag = True
             line = str(mkvinfo.stdout.readline())[2:-1].rstrip()
+        mkvinfo.stdout.close()
+        mkvinfo.wait()
+
         cmd = [MKVINFO, "-s", filename]
         frames = []
         mkvinfo = Popen(cmd, stdout=PIPE)
