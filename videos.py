@@ -360,7 +360,7 @@ class Videos:
         print(p)
         p["_id"] = str(p["_id"])
         ret = json.dumps(p)
-        self.cache["profiles"] = self.get_profile()
+        self.cache["profiles"] = self.get_profiles()
         print("Updated profiles cache")
         return ret
     
