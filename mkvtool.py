@@ -41,7 +41,7 @@ class mkvtool:
         mkvinfo.wait()
 
         cmd = [MKVINFO, "-s", filename]
-        frames = []
+        i_frames = []
         mkvinfo = Popen(cmd, stdout=PIPE)
         line = str(mkvinfo.stdout.readline())[2:-1].rstrip()
         while line != "":
@@ -49,8 +49,8 @@ class mkvtool:
             match = mkvinfo_out_fmt.match(line)
             try:
                 frame = match.groups()
-                frames.append(frame)
-                if frame[0] == 'I' and frame[1] == '1' and duration > 0:
+                if frame[0] == 'I' and frame[1] == '1':
+                    i_frames.append(frame[2])
                     secs = ts2secs(frame[2])
                     percent = str(int(secs * 90 / duration)) + "%" 
                     report("reading I-Frames", percent)
@@ -59,11 +59,9 @@ class mkvtool:
             line = str(mkvinfo.stdout.readline())[2:-1].rstrip()
         mkvinfo.stdout.close()
         mkvinfo.wait()
-        print("filtering I-Frames")
-        report("Read file, filtering...", "90%")
-        i_frames = list(map(lambda x: x[2], filter(lambda x: x[0] == 'I' and x[1] == '1', frames)))
+
         print(i_frames)
-        report("Read file, filtering...", "100%")
+        report("reading I-Frames", "100%")
         return i_frames
     
     def split(orig, chunks, splits, report):
