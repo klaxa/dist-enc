@@ -68,7 +68,7 @@ class mkvtool:
         report("splitting", "0%")
         chunk_dir = os.path.dirname(chunks)
         chunk_name = re.sub(".mkv", "", os.path.basename(chunks))
-        cmd = [MKVMERGE, "--split", "timestamps:" + ",".join(splits), orig, "-o", chunks]
+        cmd = [MKVMERGE,  "-o", chunks, "--split", "timestamps:" + ",".join(splits), orig]
         print(cmd)
         mkvmerge = Popen(cmd, stdout=PIPE)
         line = str(mkvmerge.stdout.readline())[2:-1].rstrip()
@@ -86,8 +86,7 @@ class mkvtool:
     
     def merge(files, out, report):
         report("merging", "0%")
-        #cmd = [MKVMERGE] + " + ".join(list(map(lambda x: "\"" + x + "\"", files))).split() + ["-o", out]
-        cmd = [MKVMERGE] + " + ".join(files).split() + ["-o", out]
+        cmd = [MKVMERGE, "-o", out] + " + ".join(files).split()
         print(cmd)
         mkvmerge = Popen(cmd, stdout=PIPE)
         line = str(mkvmerge.stdout.readline())[2:-1].rstrip()
