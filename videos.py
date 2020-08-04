@@ -327,7 +327,7 @@ class Videos:
             nb = len(enc["jobs"])
             v = self.get_by_id(enc["vid"])
             p = self.get_profile_by_id(enc["pid"])
-            files = [os.path.join(ENCODE_CHUNK_DIR, enc["vid"] + "-" + str(num).zfill(3) + "-" + p["name"] + ".mkv") for num in range(1, nb)]
+            files = [os.path.join(ENCODE_CHUNK_DIR, enc["vid"] + "-" + str(num).zfill(3) + "-" + p["name"] + ".mkv") for num in range(1, nb+1)]
             out = os.path.join(ENCODE_FINAL_DIR, re.sub(".mkv", "-" + p["name"] + ".mkv", v["filename"]))
             self.update_encode(enc)
             print(files)
@@ -360,7 +360,7 @@ class Videos:
         print(p)
         p["_id"] = str(p["_id"])
         ret = json.dumps(p)
-        self.cache["profiles"] = self.get_profile()
+        self.cache["profiles"] = self.get_profiles()
         print("Updated profiles cache")
         return ret
     

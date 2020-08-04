@@ -9,7 +9,7 @@ import os.path
 MKVMERGE = "mkvmerge"
 MKVINFO = "mkvinfo"
 
-mkvinfo_out_fmt = re.compile(r"(.) frame, track (\d+), time[a-z]* (\d+) \(([0-9:\.]+)\), .*")
+mkvinfo_out_fmt = re.compile(r"(.) frame, track (\d+), time[a-z]* ([0-9:\.]+), .*")
 mkvmerge_out_fmt = re.compile(r"Progress: (\d+\%).*")
 
 def ts2secs(ts):
@@ -37,8 +37,11 @@ class mkvtool:
             if "Segment" in line:
                 segment_flag = True
             line = str(mkvinfo.stdout.readline())[2:-1].rstrip()
+        mkvinfo.stdout.close()
+        mkvinfo.wait()
+
         cmd = [MKVINFO, "-s", filename]
-        frames = []
+        i_frames = []
         mkvinfo = Popen(cmd, stdout=PIPE)
         line = str(mkvinfo.stdout.readline())[2:-1].rstrip()
         while line != "":
@@ -46,9 +49,9 @@ class mkvtool:
             match = mkvinfo_out_fmt.match(line)
             try:
                 frame = match.groups()
-                frames.append(frame)
-                if frame[0] == 'I' and frame[1] == '1' and duration > 0:
-                    secs = ts2secs(frame[3])
+                if frame[0] == 'I' and frame[1] == '1':
+                    i_frames.append(frame[2])
+                    secs = ts2secs(frame[2])
                     percent = str(int(secs * 90 / duration)) + "%" 
                     report("reading I-Frames", percent)
             except:
@@ -56,18 +59,16 @@ class mkvtool:
             line = str(mkvinfo.stdout.readline())[2:-1].rstrip()
         mkvinfo.stdout.close()
         mkvinfo.wait()
-        print("filtering I-Frames")
-        report("Read file, filtering...", "90%")
-        i_frames = list(map(lambda x: x[3], filter(lambda x: x[0] == 'I' and x[1] == '1', frames)))
+
         print(i_frames)
-        report("Read file, filtering...", "100%")
+        report("reading I-Frames", "100%")
         return i_frames
     
     def split(orig, chunks, splits, report):
         report("splitting", "0%")
         chunk_dir = os.path.dirname(chunks)
         chunk_name = re.sub(".mkv", "", os.path.basename(chunks))
-        cmd = [MKVMERGE, "--split", "timestamps:" + ",".join(splits), orig, "-o", chunks]
+        cmd = [MKVMERGE,  "-o", chunks, "--split", "timestamps:" + ",".join(splits), orig]
         print(cmd)
         mkvmerge = Popen(cmd, stdout=PIPE)
         line = str(mkvmerge.stdout.readline())[2:-1].rstrip()
@@ -85,8 +86,7 @@ class mkvtool:
     
     def merge(files, out, report):
         report("merging", "0%")
-        #cmd = [MKVMERGE] + " + ".join(list(map(lambda x: "\"" + x + "\"", files))).split() + ["-o", out]
-        cmd = [MKVMERGE] + " + ".join(files).split() + ["-o", out]
+        cmd = [MKVMERGE, "-o", out] + " + ".join(files).split()
         print(cmd)
         mkvmerge = Popen(cmd, stdout=PIPE)
         line = str(mkvmerge.stdout.readline())[2:-1].rstrip()
